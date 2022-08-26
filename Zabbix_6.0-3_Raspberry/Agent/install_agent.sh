@@ -30,7 +30,7 @@ rm /etc/zabbix/zabbix_agentd.conf
 
 sleep 5
 
-wget http://zabbix.local/zabbix_clients/zabbix_agentd.conf -P /etc/zabbix/
+wget http://zabbix.local/agents/linux/zabbix_agentd.conf -P /etc/zabbix/
 
 ipv4=$(/sbin/ip -o -4 addr list ens33 | awk '{print $4}' | cut -d/ -f1)
 
