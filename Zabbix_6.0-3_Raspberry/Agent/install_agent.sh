@@ -10,10 +10,6 @@ zbx_ipv4="server_ip"
 zbx_fqdn="server_hostname"
 
 
-#Server TimeZone
-region_capital="Europe/Rome"
-
-
 #############################
 ##### Installing Zabbix #####
 #############################

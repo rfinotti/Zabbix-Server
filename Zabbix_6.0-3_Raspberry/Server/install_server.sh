@@ -83,7 +83,7 @@ sleep 10
 #########################
 echo "Setting up apache"
 
-sed -i "s@# php_value date.timezone Europe/Riga@php_value date.timezone $region_capital@g" /etc/zabbix/apache.conf
+sed -i "s@# php_value date.timezone Europe/Riga@php_value date.timezone $mytimezone@g" /etc/zabbix/apache.conf
 
 systemctl restart apache2
 systemctl enable apache2
