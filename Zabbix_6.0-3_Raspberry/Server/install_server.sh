@@ -17,14 +17,14 @@ db_pass="zabbixDBpass"
 hostname="zabbix.local"
 
 #Server TimeZone
-region_capital="Europe/Rome"
+mytimezone="Europe/Rome"
 
 #Your Zabbix Server's IP address will be automatically passed to the script.
 #If you wish to set it up manually, please comment line 25 and uncomment line 27 and add you ip address.
 
-ipv4=$(/sbin/ip -o -4 addr list ens33 | awk '{print $4}' | cut -d/ -f1)
+zbx_ipv4=$(/sbin/ip -o -4 addr list ens33 | awk '{print $4}' | cut -d/ -f1)
 
-#ipv4="192.168.0.10"
+#zbx_ipv4="192.168.0.10"
 
 ##########################
 ##### SCRIPTS BEGINS #####
@@ -33,18 +33,20 @@ sudo apt update && apt upgrade -y
 
 sed -i "s@ubuntu@$hostname@g" /etc/hostname
 
-sed -i "s@127.0.1.1 ubuntu@$ipv4 $hostname@g" /etc/hosts
+sed -i "s@127.0.1.1 ubuntu@$zbx_ipv4 $hostname@g" /etc/hosts
 
-timedatectl set-timezone $region_capital
-
+timedatectl set-timezone $mytimezone
 
 
 #############################
 ##### Installing Zabbix #####
 #############################
-wget https://repo.zabbix.com/zabbix/6.0/raspbian/pool/main/z/zabbix-release/zabbix-release_6.0-3%2Bdebian9_all.deb
+dist=$(awk '/DISTRIB_ID=/' /etc/*-release | sed 's/DISTRIB_ID=//' | tr '[:upper:]' '[:lower:]')
+rel=$(awk '/DISTRIB_RELEASE=/' /etc/*-release | sed 's/DISTRIB_RELEASE=//')
 
-dpkg -i zabbix-release_6.0-3+debian9_all.deb
+wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-3%2B"$dist$rel"_all.deb
+
+dpkg -i zabbix-release_6.0*
 
 sudo apt update
 
@@ -115,13 +117,18 @@ EOF
 # This step will create a directory to fetch     #
 # the zabbix_agent configuration for the clients #
 ##################################################
-mkdir -p /var/www/html/zabbix_clients
+mkdir -p /var/www/html/agents/linux
 
-cat > /var/www/html/zabbix_clients/zabbix_agentd.conf <<EOF
+wget https://raw.githubusercontent.com/rfinotti/Zabbix-Server/master/Zabbix-Ubuntu_20.04/Agent/install_agent.sh -P /var/www/html/agents
+
+sed -i "s@server_ip@$zbx_ipv4@g" /var/www/html/agents/install_agent.sh
+sed -i "s@server_hostname@$hostname@g" /var/www/html/agents/install_agent.sh
+
+cat > /var/www/html/agents/linux/zabbix_agentd.conf <<EOF
 LogFile=/tmp/zabbix_agentd.log
-Server=$ipv4
-ListenPort=10051
-ServerActive=$ipv4
+Server=$zbx_ipv4
+ListenPort=10050
+ServerActive=$zbx_ipv4
 HostnameItem=system.hostname
 HostMetadata=release
 UserParameter=release,cat /etc/*release

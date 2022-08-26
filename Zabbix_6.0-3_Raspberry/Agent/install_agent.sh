@@ -1,5 +1,4 @@
 #!/bin/sh
-
 #Script by Riccardo Finotti.
 
 ############################
@@ -7,8 +6,8 @@
 ############################
 
 #Zabbix Server
-zbx_ipv4="192.168.10.5"
-zbx_fqdn="zabbix.local"
+zbx_ipv4="server_ip"
+zbx_fqdn="server_hostname"
 
 
 #Server TimeZone
@@ -18,9 +17,12 @@ region_capital="Europe/Rome"
 #############################
 ##### Installing Zabbix #####
 #############################
-wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-3%2Bubuntu20.04_all.deb
+dist=$(awk '/DISTRIB_ID=/' /etc/*-release | sed 's/DISTRIB_ID=//' | tr '[:upper:]' '[:lower:]')
+rel=$(awk '/DISTRIB_RELEASE=/' /etc/*-release | sed 's/DISTRIB_RELEASE=//')
 
-dpkg -i zabbix-release_6.0-3+ubuntu20.04_all.deb
+wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-3%2B"$dist$rel"_all.deb
+
+dpkg -i zabbix-release_6.0*
 
 sudo apt update
 
@@ -29,6 +31,8 @@ sudo apt -y install zabbix-sql-scripts zabbix-agent
 echo "$zbx_ipv4 $zbx_fqnd" >> /etc/hosts
 
 rm /etc/zabbix/zabbix_agentd.conf
+
+sleep 5
 
 wget http://zabbix.local/zabbix_clients/zabbix_agentd.conf -P /etc/zabbix/
 

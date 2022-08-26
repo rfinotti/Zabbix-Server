@@ -1,14 +1,29 @@
 # Zabbix-Server
- Automatic installer for Zabbix Server Standalone
+ Standalone Zabbix Server installer
 
-Instaling Zabbix might be a bit complex for those who try it for the first time, so i have decided to put togheter a small script that automates all the steps to perform the installation of Zabbix Standalone Server.
+I've created this script just for fun, to see how much I could automate Zabbix-Server and Zabbix-Agent installation  in Raspberry and Ubuntu Servers.
+The script will automatically detect the you Distribution and Release, will install MariaDB on your raspberry and Mysql-Server on Ubuntu.
 
-In the "install.sh" file are some variables that can be changed in order to set up your installation properly.
 
-The script is not perfect and I will keep working on it to improve it.
+In the "install_server.sh" you will see the following variables that can be modified according to your necessity:
+    
+    #Databse Root Password:
+        root_pass="rootDBPass"
 
-My goal with this is to help people that is facing Zabbix installation for the first time and finds it complicated.
+    #Zabbix Database Password:
+        db_pass="zabbixDBpass"
 
-**Remember to edit the variables at the begining of the script befoore launching it**
+    #Zabbix Server FQDN
+        hostname="zabbix.local"
 
-I hope you find it usefull.
+    #Server TimeZone
+        mytimezone="Europe/Rome"
+
+
+**Remember to edit the variables at the begining of the script before launching it**
+
+I had so much fun creating the scripts and learning from my mistakes.
+
+Leave a comment, let me know what do you think... and most important of all...
+
+HAVE FUN!!!
