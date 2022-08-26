@@ -77,6 +77,7 @@ echo "Creating Zabbix's Database"
 
 zcat /usr/share/doc/zabbix-sql-scripts/mysql/server.sql.gz | mysql -uzabbix -p$db_pass zabbix
 
+sleep 10
 #########################
 ##### Zabbix Apache #####
 #########################
@@ -87,6 +88,7 @@ sed -i "s@# php_value date.timezone Europe/Riga@php_value date.timezone $region_
 systemctl restart apache2
 systemctl enable apache2
 
+sleep 5
 #########################
 ##### Zabbix Server #####
 #########################
@@ -96,6 +98,7 @@ cp /etc/zabbix/zabbix_server.conf /etc/zabbix/zabbix_server.conf_orig
 
 sed -i "s@# DBPassword=@DBPassword=$db_pass@g" /etc/zabbix/zabbix_server.conf
 
+sleep 5
 #########################
 ##### Zabbix Agents #####
 #########################
@@ -113,15 +116,20 @@ HostMetadata=release
 UserParameter=release,cat /etc/*release
 EOF
 
+sleep 5
 ##################################################
 # This step will create a directory to fetch     #
 # the zabbix_agent configuration for the clients #
 ##################################################
+
+mkdir -p /var/www/html/agents
+
 mkdir -p /var/www/html/agents/linux
 
-wget https://raw.githubusercontent.com/rfinotti/Zabbix-Server/master/Zabbix-Ubuntu_20.04/Agent/install_agent.sh -P /var/www/html/agents
+wget https://raw.githubusercontent.com/rfinotti/Zabbix-Server/master/Zabbix_6.0-3_Ubuntu/Agent/install_agent.sh -P /var/www/html/agents/
 
 sed -i "s@server_ip@$zbx_ipv4@g" /var/www/html/agents/install_agent.sh
+
 sed -i "s@server_hostname@$hostname@g" /var/www/html/agents/install_agent.sh
 
 cat > /var/www/html/agents/linux/zabbix_agentd.conf <<EOF
