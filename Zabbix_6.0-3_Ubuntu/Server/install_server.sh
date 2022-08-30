@@ -153,7 +153,6 @@ systemctl enable zabbix-server zabbix-agent
 apt clean
 
 echo "Installation and setup finished."
-echo " "
 echo "The server will reboot in 5 seconds."
 
 sleep 5
