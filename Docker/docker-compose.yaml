@@ -9,11 +9,14 @@ services:
         DB_SERVER_HOST: ${DB_SERVER_HOST}
         MYSQL_USER: ${MYSQL_USER}
         MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    container_name: ${CONTAINER_NAME}-backend
+    container_name: ${CONTAINER_NAME}-backend.local
+    restart: always
     volumes:
-      - .zabbix-data:/var/lib/mysql
+      - .zdata:/var/lib/mysql
     ports:
       - 3306:3306
+    networks:
+      - zabbix-network
 
   frontend:
     build:
@@ -25,15 +28,21 @@ services:
         DB_SERVER_HOST: ${DB_SERVER_HOST}
         MYSQL_USER: ${MYSQL_USER}
         MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    container_name: ${CONTAINER_NAME}-frontend
+    container_name: ${CONTAINER_NAME}-frontend.local
+    restart: always
     volumes:
-      - .zabbix-config:/etc/zabbix
+      - .zconfig:/etc/zabbix
     ports:
       - 10050:10050
       - 10051:10051
       - 18080:80
       - 14330:433
+    networks:
+      - zabbix-network
 
 volumes:
-  .zabbix-data:
-  .zabbix-config:
+  .zdata:
+  .zconfig:
+
+networks:
+  zabbix-network:
