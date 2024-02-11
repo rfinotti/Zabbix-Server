@@ -1,0 +1,46 @@
+FROM ubuntu:22.04
+
+RUN mkdir -p /workarea
+
+# Copy setup script into the container
+COPY setup.sh /workarea/setup.sh
+
+RUN cd /workarea
+
+WORKDIR /workarea
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y wget curl apt-utils tzdata locales
+
+ENV TZ=Europe/Rome
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Configure locales
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    sed -i -e 's/# it_IT.UTF-8 UTF-8/it_IT.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
+
+RUN wget https://repo.zabbix.com/zabbix/6.4/ubuntu-arm64/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu22.04_all.deb  && \
+    DEBIAN_FRONTEND=noninteractive dpkg -i zabbix-release_6.4-1+ubuntu22.04_all.deb
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent mysql-server mysql-client && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
+
+# Copy MySQL setup script into the container
+COPY setup.sh /workarea/setup.sh
+
+# Make setup.sh executable
+RUN chmod +x /workarea/setup.sh
+
+# Configure Apache to publish Zabbix as the default website
+RUN sed -i 's/DocumentRoot \/var\/www\/html/DocumentRoot \/usr\/share\/zabbix/' /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 80
+EXPOSE 443
+EXPOSE 3306
+EXPOSE 10050
+EXPOSE 10051
+
+# Start Apache and Zabbix Server during container creation
+CMD service apache2 start && service zabbix-server start && /workarea/setup.sh

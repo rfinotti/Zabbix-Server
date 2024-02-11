@@ -1,0 +1,25 @@
+version: '3.8'
+networks:
+  vlan:
+    external: true
+volumes:
+    zabbix_conf:
+    zabbix_data:
+services:
+  all-in-one_zabbix:
+    image: <zabbix_image_name> # use the image you just built using the dockerfile
+    container_name: zabbix
+    restart: unless-stopped
+    environment:
+		MYSQL_ROOT_PASSWORD: root_password
+		MYSQL_DB_NAME: zabbix
+		MYSQL_DB_USER: zabbix
+		MYSQL_DB_PASS: zbxpass
+    volumes:
+		- ./zabbix_conf:/etc/zabbix
+		- ./zabbix_data:/var/lib/mysql
+    ports:
+		- "10050:10050"
+		- "10051:10051"
+    networks:
+		- vlan
